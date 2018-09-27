@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "rt": {
+      "commandName": "Project",
+      "commandLineArgs": "tcp://node03.kv7.openov.nl:7817 /GOVI/KV8"
+    }
+  }
+}

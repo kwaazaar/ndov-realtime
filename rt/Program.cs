@@ -11,34 +11,43 @@ namespace rt
 {
     class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
-            using (var sub = new SubscriberSocket())
+            if (args.Length < 2)
             {
-                List<string[]> messages = new List<string[]>();
+                Console.WriteLine("Arguments: <nodeAddr> <subscr...>");
+                Console.WriteLine("Eg: tcp://node03.kv7.openov.nl:7817 /GOVI/KV8");
+                return -1;
+            }
 
-                const string nodeAddr = "tcp://node03.kv7.openov.nl:7817";
-                sub.Connect(nodeAddr);
+            var nodeAddr = args[0];
+            var subscriptions = args.Skip(1).ToArray();
+
+            using (var socket = new SubscriberSocket())
+            {
+                int msgCount = 0;
+                socket.Connect(nodeAddr);
                 try
                 {
-                    sub.Subscribe("/GOVI/KV8");
-                    sub.Subscribe("/GOVI/KV7calendar");
-                    sub.Subscribe("/GOVI/KV7planning");
-
-                    while (messages.Count < 20)
+                    subscriptions.All((s) =>
                     {
-                        var messageList = sub.ReceiveMultipartBytes(2);
+                        socket.Subscribe(s);
+                        return true;
+                    });
+
+                    while (msgCount < 20)
+                    {
+                        var messageList = socket.ReceiveMultipartBytes(2);
+                        msgCount++;
                         var msg1 = Encoding.UTF8.GetString(messageList[0]);
                         using (GZipStream stream = new GZipStream(new MemoryStream(messageList[1]), CompressionMode.Decompress))
                         using (var sr = new StreamReader(stream))
                         {
                             var msg2 = sr.ReadToEnd();
-                            messages.Add(new string[] { msg1, msg2 });
-
-                            if (msg1.StartsWith("/GOVI/KV8generalmessages"))
-                            {
-                                msg2.Split('\n').Skip(1).ToList().ForEach(s => Console.WriteLine(s));
-                            }
+                            Console.Write($"{msg1} - {msg2.Length} chars...");
+                            var filename = msg1.Substring(1).Replace('/', '-') + $"{msgCount}.txt";
+                            File.WriteAllText(filename, msg2, Encoding.UTF8);
+                            Console.WriteLine();
                         }
                     }
                 }
@@ -46,14 +55,12 @@ namespace rt
                 {
                     //The biggest difference between the two libraries. You can disconnect, close and terminate manually.
                     //So make sure not to forget this.
-                    sub.Disconnect(nodeAddr);
-                    sub.Close();
+                    socket.Disconnect(nodeAddr);
+                    socket.Close();
                 }
             }
 
-
-
-
+            return 0;
         }
     }
 }

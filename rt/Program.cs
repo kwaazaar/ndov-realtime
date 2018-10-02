@@ -45,7 +45,7 @@ namespace rt
                         {
                             var msg2 = sr.ReadToEnd();
                             Console.Write($"{msg1} - {msg2.Length} chars...");
-                            var filename = msg1.Substring(1).Replace('/', '-') + $"{msgCount}.txt";
+                            var filename = msg1.Substring(1).Replace('/', '-') + $"{msgCount}.xml";
                             File.WriteAllText(filename, msg2, Encoding.UTF8);
                             Console.WriteLine();
                         }

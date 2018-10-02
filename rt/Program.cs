@@ -35,6 +35,7 @@ namespace rt
                         return true;
                     });
 
+                    // Download just 20 messages, it's just a test tool...
                     while (msgCount < 20)
                     {
                         var messageList = socket.ReceiveMultipartBytes(2);
@@ -53,8 +54,6 @@ namespace rt
                 }
                 finally
                 {
-                    //The biggest difference between the two libraries. You can disconnect, close and terminate manually.
-                    //So make sure not to forget this.
                     socket.Disconnect(nodeAddr);
                     socket.Close();
                 }

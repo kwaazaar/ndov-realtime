@@ -2,7 +2,7 @@
   "profiles": {
     "rt": {
       "commandName": "Project",
-      "commandLineArgs": "tcp://node03.kv7.openov.nl:7817 /GOVI/KV8"
+      "commandLineArgs": "tcp://pubsub.besteffort.ndovloket.nl:7658 /QBUZZ/KV6posinfo"
     }
   }
 }
